@@ -15,7 +15,9 @@
           Quasar App
         </q-toolbar-title>
 
-        <div>Quasar v{{ $q.version }}</div>
+        <div>
+          <q-btn flat icon="logout" @click="logout" />
+        </div>
       </q-toolbar>
     </q-header>
 
@@ -36,6 +38,10 @@
           :key="link.title"
           v-bind="link"
         />
+
+        <div>
+          نسخه {{ $q.version }}
+        </div>
       </q-list>
     </q-drawer>
 
@@ -110,6 +116,11 @@ export default defineComponent({
       toggleLeftDrawer () {
         leftDrawerOpen.value = !leftDrawerOpen.value
       }
+    }
+  },
+  methods: {
+    logout () {
+      this.$store.dispatch('Auth/logOut')
     }
   }
 })

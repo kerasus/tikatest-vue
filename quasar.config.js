@@ -32,6 +32,7 @@ module.exports = configure(function (ctx) {
 
     // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-css
     css: [
+      'sahel.css',
       'app.scss'
     ],
 
@@ -61,10 +62,11 @@ module.exports = configure(function (ctx) {
       // Applies only if "transpile" is set to true.
       // transpileDependencies: [],
 
-      // rtl: true, // https://quasar.dev/options/rtl-support
-      // preloadChunks: true,
-      // showProgress: false,
-      // gzip: true,
+      rtl: true, // https://quasar.dev/options/rtl-support
+      preloadChunks: true,
+      showProgress: true,
+      gzip: true,
+      minify: true,
       // analyze: true,
 
       // Options below are automatically set depending on the env, set them if you want to override
@@ -72,12 +74,16 @@ module.exports = configure(function (ctx) {
 
       // https://v2.quasar.dev/quasar-cli-webpack/handling-webpack
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-      
+
       chainWebpack (chain) {
+        const hashh = '[id]-[name]-[chunkhash]-[contenthash]'+Date.now()
+        chain.output.filename('js/bundle/[id]/[name]/[chunkhash]/[contenthash]/'+hashh+'.bundle.js')
+        chain.output.chunkFilename('js/chunk/[id]/[name]/[chunkhash]/[contenthash]/'+hashh+'.chunk.js')
+
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js', 'vue' ] }])
       }
-      
+
     },
 
     // Full list of options: https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-devServer
@@ -86,7 +92,20 @@ module.exports = configure(function (ctx) {
         type: 'http'
       },
       port: 8080,
-      open: true // opens browser window automatically
+      open: true, // opens browser window automatically
+      https: false,
+      proxy: {
+        '/api/v1': {
+          target: 'http://www.tikatest.ir/app/laravel/public/api',
+          // target: process.env.AUTH_API_SERVER,
+          changeOrigin: true,
+          secure: false,
+          pathRewrite: {
+            '^/api/v1': ''
+          }
+        }
+      }
+
     },
 
     // https://v2.quasar.dev/quasar-cli-webpack/quasar-config-js#Property%3A-framework
@@ -94,7 +113,7 @@ module.exports = configure(function (ctx) {
       config: {},
 
       // iconSet: 'material-icons', // Quasar icon set
-      // lang: 'en-US', // Quasar language pack
+      lang: 'fa', // Quasar language pack (en-US)
 
       // For special cases outside of where the auto-import strategy can have an impact
       // (like functional components as one of the examples),
@@ -104,7 +123,12 @@ module.exports = configure(function (ctx) {
       // directives: [],
 
       // Quasar plugins
-      plugins: []
+      plugins: [
+        'Notify',
+        'Cookies',
+        'Loading',
+        'AddressbarColor'
+      ]
     },
 
     // animations: 'all', // --- includes all animations
@@ -124,12 +148,12 @@ module.exports = configure(function (ctx) {
       maxAge: 1000 * 60 * 60 * 24 * 30,
         // Tell browser when a file from the server should expire from cache (in ms)
 
-      
+
       chainWebpackWebserver (chain) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js' ] }])
       },
-      
+
 
       middlewares: [
         ctx.prod ? 'compression' : '',
@@ -144,12 +168,12 @@ module.exports = configure(function (ctx) {
 
       // for the custom service worker ONLY (/src-pwa/custom-service-worker.[js|ts])
       // if using workbox in InjectManifest mode
-      
+
       chainWebpackCustomSW (chain) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js' ] }])
       },
-      
+
 
       manifest: {
         name: `TikaTest`,
@@ -223,19 +247,19 @@ module.exports = configure(function (ctx) {
       },
 
       // "chain" is a webpack-chain object https://github.com/neutrinojs/webpack-chain
-      
+
       chainWebpackMain (chain) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js' ] }])
       },
-      
 
-      
+
+
       chainWebpackPreload (chain) {
         chain.plugin('eslint-webpack-plugin')
           .use(ESLintPlugin, [{ extensions: [ 'js' ] }])
       },
-      
+
     }
   }
 });
